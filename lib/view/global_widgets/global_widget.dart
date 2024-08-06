@@ -21,6 +21,7 @@ class GlobalWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
+        width: double.infinity,
         padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
             color: notecolor,
@@ -30,26 +31,59 @@ class GlobalWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text(cusomtitle),
-                Spacer(),
-                IconButton(onPressed: isEdit, icon: Icon(Icons.edit)),
-                IconButton(onPressed: ondelete, icon: Icon(Icons.delete))
+                Row(
+                  children: [
+                    IconButton(
+                        onPressed: isEdit,
+                        icon: Icon(
+                          Icons.edit,
+                          color: Colors.black,
+                        )),
+                    IconButton(
+                        onPressed: ondelete,
+                        icon: Icon(
+                          Icons.delete,
+                          color: Colors.black,
+                        )),
+                    IconButton(
+                        onPressed: () {
+                          Share.share(
+                              'check out my website https://example.com');
+                        },
+                        icon: Icon(
+                          Icons.share,
+                          color: Colors.black,
+                        ))
+                  ],
+                ),
               ],
             ),
-            Text(customdescreption),
+            Text(
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              cusomtitle,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Text(
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              customdescreption,
+              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text(customdate),
-                IconButton(
-                    onPressed: () {
-                      Share.share('check out my website https://example.com');
-                    },
-                    icon: Icon(Icons.share))
+                Text(
+                  customdate,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ],
-            )
+            ),
           ],
         ),
       ),

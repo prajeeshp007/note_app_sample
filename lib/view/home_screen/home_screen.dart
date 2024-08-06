@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:intl/intl.dart';
 import 'package:note_app_sample/dummy_db.dart';
+import 'package:note_app_sample/utils/app_sessions.dart';
 import 'package:note_app_sample/view/global_widgets/global_widget.dart';
+import 'package:note_app_sample/view/notes_detail_screen/notes_details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -18,45 +22,106 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController descreptioncontroller = TextEditingController();
   TextEditingController datecontroller = TextEditingController();
 
+  ///step 2 reference adding
+  var notebox = Hive.box(AppSessions.NOTEBOX);
+  List notkeys = [];
+  @override
+
+  /// initial value et cheyyan vendi hann initstate set chythh
+  void initState() {
+    ///to upadte the keys list
+    notkeys = notebox.keys.toList();
+    setState(() {});
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () {
-          titlecontroller.clear();
-          datecontroller.clear();
-          descreptioncontroller.clear();
-          selectedcolorindex = 0;
-          _customBottomSheet(context);
-        },
-      ),
-      body: ListView.separated(
-          itemBuilder: (context, index) => GlobalWidget(
-                notecolor:
-                    DummyDb.notecolor[DummyDb.items[index]['colorindex']],
-                isEdit: () {
-                  titlecontroller.text = DummyDb.items[index]['title'];
-                  descreptioncontroller.text =
-                      DummyDb.items[index]['descreption'];
-                  datecontroller.text = DummyDb.items[index]['date'];
-                  selectedcolorindex = DummyDb.items[index]['colorindex'];
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          onPressed: () {
+            titlecontroller.clear();
+            datecontroller.clear();
+            descreptioncontroller.clear();
+            selectedcolorindex = 0;
+            _customBottomSheet(context);
+          },
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                child: Text(
+                  "MY NOTES",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 35),
+                ),
+              ),
+              GridView.builder(
+                physics: ScrollPhysics(),
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  var CurrentNote = notebox.get(notkeys[index]);
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => NotesDetailsScreen(
+                              date: datecontroller.text = CurrentNote['date'],
+                              descreption: descreptioncontroller.text =
+                                  CurrentNote['descreption'],
+                              title: titlecontroller.text =
+                                  CurrentNote['title'],
+                              colors:
+                                  DummyDb.notecolor[CurrentNote['colorindex']],
+                            ),
+                          ));
+                    },
+                    child: GlobalWidget(
+                      notecolor: DummyDb.notecolor[CurrentNote['colorindex']],
+                      isEdit: () {
+                        titlecontroller.text = CurrentNote['title'];
+                        descreptioncontroller.text = CurrentNote['descreption'];
+                        datecontroller.text = CurrentNote['date'];
+                        selectedcolorindex = CurrentNote['colorindex'];
 
-                  _customBottomSheet(context, isEdit: true, itemindex: index);
+                        _customBottomSheet(context,
+                            isEdit: true, itemindex: index);
+                      },
+
+                      ///delete icon section
+                      ondelete: () {
+                        notebox.delete(notkeys[index]);
+                        notkeys = notebox.keys.toList();
+                        setState(() {});
+                      },
+                      cusomtitle: CurrentNote['title'],
+                      customdescreption: CurrentNote['descreption'],
+                      customdate: CurrentNote['date'],
+                    ),
+                  );
                 },
-                ondelete: () {
-                  DummyDb.items.removeAt(index);
-                  setState(() {});
-                },
-                cusomtitle: DummyDb.items[index]['title'],
-                customdescreption: DummyDb.items[index]['descreption'],
-                customdate: DummyDb.items[index]['date'],
+                itemCount: notkeys.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 5,
+                    mainAxisSpacing: 10,
+                    mainAxisExtent: 250),
               ),
-          separatorBuilder: (context, index) => SizedBox(
-                height: 10,
-              ),
-          itemCount: DummyDb.items.length),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -86,7 +151,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: 20,
                     ),
                     TextFormField(
-                      maxLines: 5,
                       controller: descreptioncontroller,
                       decoration: InputDecoration(
                           labelText: 'Descreption',
@@ -99,8 +163,22 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: 20,
                     ),
                     TextFormField(
+                      readOnly: true,
                       controller: datecontroller,
                       decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            onPressed: () async {
+                              var selectedDate = await showDatePicker(
+                                  context: context,
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime.now());
+                              if (selectedDate != null) {
+                                datecontroller.text =
+                                    DateFormat('dd/MMM/y').format(selectedDate);
+                              }
+                            },
+                            icon: Icon(Icons.calendar_month_outlined),
+                          ),
                           labelText: 'Date',
                           filled: true,
                           fillColor: Colors.grey,
@@ -164,20 +242,25 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: TextButton(
                               onPressed: () {
                                 isEdit
-                                    ? DummyDb.items[itemindex!] = {
+                                    ? notebox.put(notkeys[itemindex!], {
                                         'title': titlecontroller.text,
                                         'descreption':
                                             descreptioncontroller.text,
                                         'date': datecontroller.text,
                                         'colorindex': selectedcolorindex,
-                                      }
-                                    : DummyDb.items.add({
+                                      })
+
+                                    ///step 3 data adding
+                                    : notebox.add({
                                         'title': titlecontroller.text,
                                         'descreption':
                                             descreptioncontroller.text,
                                         'date': datecontroller.text,
                                         'colorindex': selectedcolorindex,
                                       });
+                                notkeys = notebox.keys.toList();
+
+                                ///this is used to update the keys list after adding to textcontroller
                                 setState(() {});
 
                                 Navigator.pop(context);
