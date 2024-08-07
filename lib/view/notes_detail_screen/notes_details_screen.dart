@@ -1,20 +1,31 @@
 import 'package:flutter/material.dart';
 
-class NotesDetailsScreen extends StatelessWidget {
+class NotesDetailsScreen extends StatefulWidget {
   const NotesDetailsScreen(
       {super.key,
       required this.title,
       required this.descreption,
       required this.date,
-      required this.colors});
+      required this.colors,
+      this.isedit});
   final String title;
   final String descreption;
   final String date;
   final Color colors;
+  final void Function()? isedit;
 
+  @override
+  State<NotesDetailsScreen> createState() => _NotesDetailsScreenState();
+}
+
+class _NotesDetailsScreenState extends State<NotesDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.edit),
+          onPressed: widget.isedit,
+        ),
         appBar: AppBar(),
         body: Center(
             child: Padding(
@@ -22,7 +33,7 @@ class NotesDetailsScreen extends StatelessWidget {
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             decoration: BoxDecoration(
-              color: colors,
+              color: widget.colors,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -39,7 +50,7 @@ class NotesDetailsScreen extends StatelessWidget {
                       width: 5,
                     ),
                     Text(
-                      title,
+                      widget.title,
                       style:
                           TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
                     ),
@@ -58,7 +69,7 @@ class NotesDetailsScreen extends StatelessWidget {
                       decorationThickness: 2),
                 ),
                 Text(
-                  descreption,
+                  widget.descreption,
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
                 ),
                 SizedBox(
@@ -75,7 +86,7 @@ class NotesDetailsScreen extends StatelessWidget {
                       width: 5,
                     ),
                     Text(
-                      date,
+                      widget.date,
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                     ),

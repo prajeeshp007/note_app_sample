@@ -76,7 +76,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
+                            /// notesdetails screen navigation section
+
                             builder: (context) => NotesDetailsScreen(
+                              isedit: () {
+                                _customBottomSheet(context,
+                                    isEdit: true, itemindex: index);
+                                titlecontroller.text = CurrentNote['title'];
+                                descreptioncontroller.text =
+                                    CurrentNote['descreption'];
+                                datecontroller.text = CurrentNote['date'];
+                                selectedcolorindex = CurrentNote['colorindex'];
+                                notkeys = notebox.keys.toList();
+                                setState(() {});
+                              },
                               date: datecontroller.text = CurrentNote['date'],
                               descreption: descreptioncontroller.text =
                                   CurrentNote['descreption'],
@@ -88,16 +101,17 @@ class _HomeScreenState extends State<HomeScreen> {
                           ));
                     },
                     child: GlobalWidget(
+                      /// is edit true ayyaaa custom bottom sheet
                       notecolor: DummyDb.notecolor[CurrentNote['colorindex']],
-                      isEdit: () {
-                        titlecontroller.text = CurrentNote['title'];
-                        descreptioncontroller.text = CurrentNote['descreption'];
-                        datecontroller.text = CurrentNote['date'];
-                        selectedcolorindex = CurrentNote['colorindex'];
+                      // isEdit: () {
+                      //   titlecontroller.text = CurrentNote['title'];
+                      //   descreptioncontroller.text = CurrentNote['descreption'];
+                      //   datecontroller.text = CurrentNote['date'];
+                      //   selectedcolorindex = CurrentNote['colorindex'];
 
-                        _customBottomSheet(context,
-                            isEdit: true, itemindex: index);
-                      },
+                      //   _customBottomSheet(context,
+                      //       isEdit: true, itemindex: index);
+                      // },
 
                       ///delete icon section
                       ondelete: () {
@@ -124,6 +138,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  /// is edit false custom bottom sheet
 
   Future<dynamic> _customBottomSheet(BuildContext context,
       {bool isEdit = false, int? itemindex}) {

@@ -28,38 +28,9 @@ class GlobalWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             border: Border.all(width: 0)),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Row(
-                  children: [
-                    IconButton(
-                        onPressed: isEdit,
-                        icon: Icon(
-                          Icons.edit,
-                          color: Colors.black,
-                        )),
-                    IconButton(
-                        onPressed: ondelete,
-                        icon: Icon(
-                          Icons.delete,
-                          color: Colors.black,
-                        )),
-                    IconButton(
-                        onPressed: () {
-                          Share.share(
-                              'check out my website https://example.com');
-                        },
-                        icon: Icon(
-                          Icons.share,
-                          color: Colors.black,
-                        ))
-                  ],
-                ),
-              ],
-            ),
             Text(
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -73,15 +44,37 @@ class GlobalWidget extends StatelessWidget {
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
               customdescreption,
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+            ),
+            SizedBox(
+              height: 5,
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Text(
                   customdate,
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                    onPressed: ondelete,
+                    icon: Icon(
+                      Icons.delete,
+                      color: Colors.black,
+                    )),
+                IconButton(
+                    onPressed: () {
+                      Share.share('check out my website https://example.com');
+                    },
+                    icon: Icon(
+                      Icons.share,
+                      color: Colors.black,
+                    ))
               ],
             ),
           ],
